@@ -17,12 +17,14 @@
       :token-parser (lambda (item)
                       (list* (cons :token--type "Bearer") (oauth2::parse-json item))))))
 
+(defun get-current-yandex-user (auth-token)
+  (json:decode-json-from-string 
+    (flexi-streams:octets-to-string 
+      (apply
+        'oauth2::http-request 
+        "https://login.yandex.ru/info"  
+        :additional-headers `((("Authorization" . ,(format nil "OAuth ~A" (oauth2:token-string auth-token))))))
+      :external-format :utf-8)))
+
 (defmethod get-social-auth-user-id ((network (eql :yandex)) auth-token)
-  (cdr (assoc :id 
-              (json:decode-json-from-string 
-                (flexi-streams:octets-to-string 
-                  (apply
-                    'oauth2::http-request 
-                    "https://login.yandex.ru/info"  
-                    :additional-headers `((("Authorization" . ,(format nil "OAuth ~A" "b2d7430dd92141ce873fc9813b60badb")))))
-                  :external-format :utf-8)))))
+  (cdr (assoc :id (get-current-yandex-user auth-token))))
