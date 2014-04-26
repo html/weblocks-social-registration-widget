@@ -73,8 +73,9 @@
 
 (defmethod get-social-auth-settings (network)
   (let ((settings (getf *social-auth-settings* network)))
-    (setf (getf settings :redirect-uri) 
-          (format nil 
-                  (slot-value *social-widget* 'site-url-template)
-                  (url-for (social-registration-widget-uri-key *social-widget* :finish) (string-downcase network))))
+    (when *social-widget* 
+      (setf (getf settings :redirect-uri) 
+            (format nil 
+                    (slot-value *social-widget* 'site-url-template)
+                    (url-for (social-registration-widget-uri-key *social-widget* :finish) (string-downcase network)))))
     settings))
