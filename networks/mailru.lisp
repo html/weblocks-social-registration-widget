@@ -24,6 +24,7 @@
                ("client_secret" . ,(getf settings :client-secret)))
       :token-parser (lambda (item)
                       (let ((data (json:decode-json-from-string item)))
+                        (setf (cdr (assoc :token--type data)) "Bearer")
                         (setf (get 'user-id :mailru) (cdr (assoc :x--mailru--vid data)))
                         data)))))
 
